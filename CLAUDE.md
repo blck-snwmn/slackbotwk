@@ -12,7 +12,7 @@ Slack Bot application running on Cloudflare Workers. Provides a reception/inquir
 - Language: TypeScript (strict mode)
 - Slack SDK: @slack/bolt
 - Package Manager: Bun
-- Testing: Vitest with @cloudflare/vitest-pool-workers
+- Testing: Vitest (unit tests co-located with source files)
 - Linting/Formatting: oxlint, oxfmt
 
 ## Commands
@@ -40,9 +40,11 @@ src/
 │   ├── commands.ts   # Slash commands (/hello, /help, /reception)
 │   ├── events.ts     # Event handlers (app_mention)
 │   └── actions.ts    # Interactive component handlers (buttons, modal submissions)
-└── blocks/
-    ├── messages.ts   # Message block definitions (help, reception menu)
-    └── modals.ts     # Modal view definitions (question, request, bug, other)
+├── blocks/
+│   ├── messages.ts   # Message block definitions (help, reception menu)
+│   └── modals.ts     # Modal view definitions (question, request, bug, other)
+└── validators/
+    └── datetime.ts   # Date/time validation for bug reports
 ```
 
 **Request Flow:**
@@ -77,3 +79,28 @@ Required secrets (set via `wrangler secret put`):
 **New Event:**
 1. Add handler in `src/handlers/events.ts`
 2. Subscribe to event in Slack App configuration
+
+## Testing
+
+Unit tests are co-located with source files (`*.test.ts`).
+
+**Test Structure:**
+- `src/receiver.test.ts` - Signature verification, request handling
+- `src/blocks/*.test.ts` - Message/modal block definitions
+- `src/validators/*.test.ts` - Validation logic
+
+## Known Issues
+
+### vitest-pool-workers and @slack/bolt Compatibility
+
+`@slack/bolt` internally uses `node:os`, which causes `@cloudflare/vitest-pool-workers` tests to fail.
+
+**Related GitHub Issues:**
+- [#9719](https://github.com/cloudflare/workers-sdk/issues/9719) - node:os module resolution issue
+- [#7324](https://github.com/cloudflare/workers-sdk/issues/7324) - Node module compatibility issue
+
+**Current Workaround:**
+- Use standard Vitest instead of vitest-pool-workers
+- Test only parts that don't depend on `@slack/bolt` (blocks/, validators/, parts of receiver)
+
+**Note:** Check the above issues for updates before modifying tests. This may be fixed in the future.

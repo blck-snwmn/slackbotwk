@@ -1,6 +1,7 @@
 import type { App } from "@slack/bolt";
 import type { RichTextBlock } from "@slack/types";
 import { questionModal, requestModal, bugModal, otherModal } from "../blocks/modals";
+import { validateBugDateTime } from "../validators/datetime";
 
 export function registerActions(app: App): void {
 	// Button action handlers
@@ -162,38 +163,18 @@ export function registerActions(app: App): void {
 	});
 
 	app.view("bug_submit", async ({ ack, body, view, client }) => {
-		const date = view.state.values.bug_date.date_picker.selected_date;
-		const time = view.state.values.bug_time.time_picker.selected_time;
+		const date = view.state.values.bug_date.date_picker.selected_date ?? undefined;
+		const time = view.state.values.bug_time.time_picker.selected_time ?? undefined;
 
-		// Validate: date and time must not be in the future
-		if (date) {
-			const now = new Date();
-			const today = now.toISOString().split("T")[0]; // YYYY-MM-DD
-
-			// Check if date is in the future
-			if (date > today) {
-				await ack({
-					response_action: "errors",
-					errors: {
-						bug_date: "発生日は今日以前の日付を選択してください",
-					},
-				});
-				return;
-			}
-
-			// If date is today and time is provided, check if time is in the future
-			if (date === today && time) {
-				const selectedDateTime = new Date(`${date}T${time}`);
-				if (selectedDateTime > now) {
-					await ack({
-						response_action: "errors",
-						errors: {
-							bug_time: "発生時刻は現在より前を指定してください",
-						},
-					});
-					return;
-				}
-			}
+		const validation = validateBugDateTime(date, time);
+		if (!validation.valid) {
+			await ack({
+				response_action: "errors",
+				errors: {
+					[validation.field]: validation.error,
+				},
+			});
+			return;
 		}
 
 		await ack();

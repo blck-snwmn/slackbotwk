@@ -87,6 +87,11 @@ export class WorkersReceiver implements Receiver {
 		hmac.update(sigBasestring);
 		const mySignature = `v0=${hmac.digest("hex")}`;
 
+		// timingSafeEqual requires same length buffers
+		if (mySignature.length !== signature.length) {
+			return false;
+		}
+
 		return crypto.timingSafeEqual(Buffer.from(mySignature), Buffer.from(signature));
 	}
 
