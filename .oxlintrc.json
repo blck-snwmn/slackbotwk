@@ -1,0 +1,16 @@
+{
+	"$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+	"plugins": ["typescript"],
+	"rules": {
+		"typescript/no-non-null-assertion": "error",
+		"typescript/consistent-type-assertions": [
+			"error",
+			{
+				"assertionStyle": "never"
+			}
+		],
+		"no-unused-vars": "error",
+		"eqeqeq": "error"
+	},
+	"ignorePatterns": ["node_modules", "dist", "worker-configuration.d.ts"]
+}
