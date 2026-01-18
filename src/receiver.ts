@@ -1,10 +1,4 @@
-import type {
-	Receiver,
-	ReceiverEvent,
-	App,
-	AckFn,
-	StringIndexed,
-} from "@slack/bolt";
+import type { Receiver, ReceiverEvent, App, AckFn, StringIndexed } from "@slack/bolt";
 import crypto from "node:crypto";
 
 export class WorkersReceiver implements Receiver {
@@ -82,11 +76,7 @@ export class WorkersReceiver implements Receiver {
 		return new Response("Bot not initialized", { status: 500 });
 	}
 
-	private verifySignature(
-		body: string,
-		timestamp: string,
-		signature: string
-	): boolean {
+	private verifySignature(body: string, timestamp: string, signature: string): boolean {
 		const fiveMinutesAgo = Math.floor(Date.now() / 1000) - 60 * 5;
 		if (parseInt(timestamp, 10) < fiveMinutesAgo) {
 			return false;
@@ -97,10 +87,7 @@ export class WorkersReceiver implements Receiver {
 		hmac.update(sigBasestring);
 		const mySignature = `v0=${hmac.digest("hex")}`;
 
-		return crypto.timingSafeEqual(
-			Buffer.from(mySignature),
-			Buffer.from(signature)
-		);
+		return crypto.timingSafeEqual(Buffer.from(mySignature), Buffer.from(signature));
 	}
 
 	private parseBody(body: string, contentType: string): StringIndexed {

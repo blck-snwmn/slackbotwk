@@ -1,11 +1,6 @@
 import type { App } from "@slack/bolt";
 import type { RichTextBlock } from "@slack/types";
-import {
-	questionModal,
-	requestModal,
-	bugModal,
-	otherModal,
-} from "../blocks/modals";
+import { questionModal, requestModal, bugModal, otherModal } from "../blocks/modals";
 
 export function registerActions(app: App): void {
 	// Button action handlers
@@ -58,12 +53,9 @@ export function registerActions(app: App): void {
 		await ack();
 
 		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
-		const category =
-			view.state.values.question_category.category_select.selected_option
-				?.value;
+		const category = view.state.values.question_category.category_select.selected_option?.value;
 		const question = view.state.values.question_input.question_text.value;
-		const assignee =
-			view.state.values.question_assignee.assignee_select.selected_user;
+		const assignee = view.state.values.question_assignee.assignee_select.selected_user;
 
 		const blocks = [
 			{
@@ -103,45 +95,42 @@ export function registerActions(app: App): void {
 
 		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
 		const title = view.state.values.request_title.title_text.value;
-		const descriptionRichText = view.state.values.request_description
-			.description_rich_text.rich_text_value as RichTextBlock | undefined;
+		const descriptionRichText = view.state.values.request_description.description_rich_text
+			.rich_text_value as RichTextBlock | undefined;
 		const categories =
 			view.state.values.request_category.category_checkboxes.selected_options?.map(
 				(opt) => opt.value,
 			) ?? [];
-		const priority =
-			view.state.values.request_priority.priority_radio.selected_option?.value;
-		const assignee =
-			view.state.values.request_assignee.assignee_select.selected_user;
+		const priority = view.state.values.request_priority.priority_radio.selected_option?.value;
+		const assignee = view.state.values.request_assignee.assignee_select.selected_user;
 
-		const categoryText =
-			categories.length > 0 ? categories.join(", ") : "None";
+		const categoryText = categories.length > 0 ? categories.join(", ") : "None";
 
 		const blocks: (
 			| {
-				type: "header";
-				text: { type: "plain_text"; text: string; emoji: boolean };
-			}
+					type: "header";
+					text: { type: "plain_text"; text: string; emoji: boolean };
+			  }
 			| { type: "section"; text: { type: "mrkdwn"; text: string } }
 			| RichTextBlock
 		)[] = [
-				{
-					type: "header",
-					text: { type: "plain_text", text: "New Feature Request", emoji: true },
-				},
-				{
-					type: "section",
-					text: { type: "mrkdwn", text: `*From:* <@${body.user.id}>` },
-				},
-				{
-					type: "section",
-					text: { type: "mrkdwn", text: `*Title:* ${title}` },
-				},
-				{
-					type: "section",
-					text: { type: "mrkdwn", text: "*Description:*" },
-				},
-			];
+			{
+				type: "header",
+				text: { type: "plain_text", text: "New Feature Request", emoji: true },
+			},
+			{
+				type: "section",
+				text: { type: "mrkdwn", text: `*From:* <@${body.user.id}>` },
+			},
+			{
+				type: "section",
+				text: { type: "mrkdwn", text: `*Title:* ${title}` },
+			},
+			{
+				type: "section",
+				text: { type: "mrkdwn", text: "*Description:*" },
+			},
+		];
 
 		if (descriptionRichText) {
 			blocks.push(descriptionRichText);
@@ -213,15 +202,11 @@ export function registerActions(app: App): void {
 		const summary = view.state.values.bug_summary.summary_text.value;
 		const steps = view.state.values.bug_steps.steps_text.value;
 		const impactAreas =
-			view.state.values.bug_impact.impact_select.selected_options?.map(
-				(opt) => opt.value,
-			) ?? [];
-		const severity =
-			view.state.values.bug_severity.severity_select.selected_option?.value;
+			view.state.values.bug_impact.impact_select.selected_options?.map((opt) => opt.value) ?? [];
+		const severity = view.state.values.bug_severity.severity_select.selected_option?.value;
 		const referenceUrl = view.state.values.bug_url.url_input.value;
 
-		const impactText =
-			impactAreas.length > 0 ? impactAreas.join(", ") : "None";
+		const impactText = impactAreas.length > 0 ? impactAreas.join(", ") : "None";
 		const dateTimeText = time ? `${date} ${time}` : date;
 
 		const blocks = [
@@ -276,8 +261,7 @@ export function registerActions(app: App): void {
 		const subject = view.state.values.other_subject.subject_text.value;
 		const content = view.state.values.other_content.content_text.value;
 		const email = view.state.values.other_email.email_input.value;
-		const relatedChannel =
-			view.state.values.other_channel.channel_select.selected_channel;
+		const relatedChannel = view.state.values.other_channel.channel_select.selected_channel;
 		const urgency = view.state.values.other_urgency.urgency_input.value;
 
 		const blocks = [
