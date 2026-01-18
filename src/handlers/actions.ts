@@ -9,7 +9,7 @@ import {
 
 export function registerActions(app: App): void {
 	// Button action handlers
-	app.action("reception_question", async ({ ack, body, client }) => {
+	app.action("reception_question", async ({ ack, body, client, respond }) => {
 		await ack();
 		if (body.type !== "block_actions" || !body.channel) return;
 
@@ -17,9 +17,10 @@ export function registerActions(app: App): void {
 			trigger_id: body.trigger_id,
 			view: questionModal(body.channel.id),
 		});
+		await respond({ delete_original: true });
 	});
 
-	app.action("reception_request", async ({ ack, body, client }) => {
+	app.action("reception_request", async ({ ack, body, client, respond }) => {
 		await ack();
 		if (body.type !== "block_actions" || !body.channel) return;
 
@@ -27,9 +28,10 @@ export function registerActions(app: App): void {
 			trigger_id: body.trigger_id,
 			view: requestModal(body.channel.id),
 		});
+		await respond({ delete_original: true });
 	});
 
-	app.action("reception_bug", async ({ ack, body, client }) => {
+	app.action("reception_bug", async ({ ack, body, client, respond }) => {
 		await ack();
 		if (body.type !== "block_actions" || !body.channel) return;
 
@@ -37,9 +39,10 @@ export function registerActions(app: App): void {
 			trigger_id: body.trigger_id,
 			view: bugModal(body.channel.id),
 		});
+		await respond({ delete_original: true });
 	});
 
-	app.action("reception_other", async ({ ack, body, client }) => {
+	app.action("reception_other", async ({ ack, body, client, respond }) => {
 		await ack();
 		if (body.type !== "block_actions" || !body.channel) return;
 
@@ -47,6 +50,7 @@ export function registerActions(app: App): void {
 			trigger_id: body.trigger_id,
 			view: otherModal(body.channel.id),
 		});
+		await respond({ delete_original: true });
 	});
 
 	// Modal submission handlers
@@ -115,29 +119,29 @@ export function registerActions(app: App): void {
 
 		const blocks: (
 			| {
-					type: "header";
-					text: { type: "plain_text"; text: string; emoji: boolean };
-			  }
+				type: "header";
+				text: { type: "plain_text"; text: string; emoji: boolean };
+			}
 			| { type: "section"; text: { type: "mrkdwn"; text: string } }
 			| RichTextBlock
 		)[] = [
-			{
-				type: "header",
-				text: { type: "plain_text", text: "New Feature Request", emoji: true },
-			},
-			{
-				type: "section",
-				text: { type: "mrkdwn", text: `*From:* <@${body.user.id}>` },
-			},
-			{
-				type: "section",
-				text: { type: "mrkdwn", text: `*Title:* ${title}` },
-			},
-			{
-				type: "section",
-				text: { type: "mrkdwn", text: "*Description:*" },
-			},
-		];
+				{
+					type: "header",
+					text: { type: "plain_text", text: "New Feature Request", emoji: true },
+				},
+				{
+					type: "section",
+					text: { type: "mrkdwn", text: `*From:* <@${body.user.id}>` },
+				},
+				{
+					type: "section",
+					text: { type: "mrkdwn", text: `*Title:* ${title}` },
+				},
+				{
+					type: "section",
+					text: { type: "mrkdwn", text: "*Description:*" },
+				},
+			];
 
 		if (descriptionRichText) {
 			blocks.push(descriptionRichText);
