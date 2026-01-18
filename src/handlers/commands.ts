@@ -1,5 +1,5 @@
 import type { App } from "@slack/bolt";
-import { helpMessage } from "../blocks/messages";
+import { helpMessage, receptionMessage } from "../blocks/messages";
 
 export function registerCommands(app: App): void {
 	app.command("/hello", async ({ ack, respond }) => {
@@ -12,5 +12,10 @@ export function registerCommands(app: App): void {
 	app.command("/help", async ({ ack, respond }) => {
 		await ack();
 		await respond(helpMessage());
+	});
+
+	app.command("/reception", async ({ ack, respond }) => {
+		await ack();
+		await respond(receptionMessage());
 	});
 }

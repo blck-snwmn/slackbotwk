@@ -2,6 +2,7 @@ import { App, LogLevel } from "@slack/bolt";
 import type { Env } from "./types/env";
 import { registerCommands } from "./handlers/commands";
 import { registerEvents } from "./handlers/events";
+import { registerActions } from "./handlers/actions";
 import { WorkersReceiver } from "./receiver";
 
 export function createApp(env: Env): { app: App; receiver: WorkersReceiver } {
@@ -16,6 +17,7 @@ export function createApp(env: Env): { app: App; receiver: WorkersReceiver } {
 
 	registerCommands(app);
 	registerEvents(app);
+	registerActions(app);
 
 	return { app, receiver };
 }

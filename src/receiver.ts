@@ -59,9 +59,19 @@ export class WorkersReceiver implements Receiver {
 		// Handle events
 		if (this.bolt) {
 			try {
-				const event = this.createReceiverEvent(payload);
+				let ackResponse: unknown = undefined;
+				const event = this.createReceiverEvent(payload, (response) => {
+					ackResponse = response;
+				});
 				await this.bolt.processEvent(event);
-				// Return empty body to avoid duplicate messages
+
+				// Return ack response if provided (e.g., validation errors)
+				if (ackResponse !== undefined) {
+					return new Response(JSON.stringify(ackResponse), {
+						status: 200,
+						headers: { "Content-Type": "application/json" },
+					});
+				}
 				return new Response(null, { status: 200 });
 			} catch (error) {
 				console.error("Error processing event:", error);
@@ -113,14 +123,17 @@ export class WorkersReceiver implements Receiver {
 		return result;
 	}
 
-	private createReceiverEvent(payload: StringIndexed): ReceiverEvent {
-		const ack: AckFn<void> = async () => {
-			// Ack is handled by the response
+	private createReceiverEvent(
+		payload: StringIndexed,
+		onAck: (response: unknown) => void,
+	): ReceiverEvent {
+		const ack = async (response?: unknown): Promise<void> => {
+			onAck(response);
 		};
 
 		return {
 			body: payload,
-			ack,
+			ack: ack as AckFn<unknown>,
 			retryNum: undefined,
 			retryReason: undefined,
 			customProperties: {},
