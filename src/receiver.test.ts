@@ -9,6 +9,11 @@ function generateSlackSignature(signingSecret: string, timestamp: string, body: 
 	return `v0=${hmac.digest("hex")}`;
 }
 
+const mockCtx = {
+	waitUntil: () => {},
+	passThroughOnException: () => {},
+} as unknown as ExecutionContext;
+
 describe("WorkersReceiver", () => {
 	const signingSecret = "test-signing-secret";
 	let receiver: WorkersReceiver;
@@ -22,7 +27,7 @@ describe("WorkersReceiver", () => {
 			method: "GET",
 		});
 
-		const response = await receiver.handleRequest(request);
+		const response = await receiver.handleRequest(request, mockCtx);
 		expect(response.status).toBe(405);
 		expect(await response.text()).toBe("Method not allowed");
 	});
@@ -33,7 +38,7 @@ describe("WorkersReceiver", () => {
 			body: "{}",
 		});
 
-		const response = await receiver.handleRequest(request);
+		const response = await receiver.handleRequest(request, mockCtx);
 		expect(response.status).toBe(401);
 		expect(await response.text()).toBe("Missing signature headers");
 	});
@@ -52,7 +57,7 @@ describe("WorkersReceiver", () => {
 			body,
 		});
 
-		const response = await receiver.handleRequest(request);
+		const response = await receiver.handleRequest(request, mockCtx);
 		expect(response.status).toBe(401);
 		expect(await response.text()).toBe("Invalid signature");
 	});
@@ -72,7 +77,7 @@ describe("WorkersReceiver", () => {
 			body,
 		});
 
-		const response = await receiver.handleRequest(request);
+		const response = await receiver.handleRequest(request, mockCtx);
 		expect(response.status).toBe(401);
 		expect(await response.text()).toBe("Invalid signature");
 	});
@@ -93,7 +98,7 @@ describe("WorkersReceiver", () => {
 			body,
 		});
 
-		const response = await receiver.handleRequest(request);
+		const response = await receiver.handleRequest(request, mockCtx);
 		expect(response.status).toBe(200);
 		expect(await response.text()).toBe(challenge);
 	});
@@ -113,7 +118,7 @@ describe("WorkersReceiver", () => {
 			body,
 		});
 
-		const response = await receiver.handleRequest(request);
+		const response = await receiver.handleRequest(request, mockCtx);
 		expect(response.status).toBe(500);
 		expect(await response.text()).toBe("Bot not initialized");
 	});

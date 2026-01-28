@@ -5,21 +5,29 @@ import type { Env } from "../types/env";
 import type { ReportData } from "../types/report";
 
 export function registerCommands(app: App, env: Env): void {
-	app.command("/hello", async ({ ack, respond }) => {
-		await ack();
-		await respond({
+	app.command("/hello", async ({ ack }) => {
+		await ack({
 			text: "Hello from Cloudflare Workers!",
 		});
 	});
 
-	app.command("/help", async ({ ack, respond }) => {
-		await ack();
+	app.command("/help", async ({ respond }) => {
 		await respond(helpMessage());
 	});
 
 	app.command("/reception", async ({ ack, respond }) => {
 		await ack();
 		await respond(receptionMessage());
+	});
+
+	// Test command to verify that ack is returned immediately and
+	// background processing continues via ctx.waitUntil()
+	app.command("/heavy", async ({ ack, respond }) => {
+		await ack();
+		await new Promise((resolve) => setTimeout(resolve, 10000));
+		await respond({
+			text: "Heavy command completed after 10s delay!",
+		});
 	});
 
 	app.command("/report", async ({ ack, body, client }) => {

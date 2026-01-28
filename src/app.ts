@@ -9,9 +9,11 @@ export function createApp(env: Env): { app: App; receiver: WorkersReceiver } {
 	const receiver = new WorkersReceiver(env.SLACK_SIGNING_SECRET);
 
 	const app = new App({
-		token: env.SLACK_BOT_TOKEN,
 		receiver,
-		processBeforeResponse: true,
+		authorize: async () => ({
+			botToken: env.SLACK_BOT_TOKEN,
+		}),
+		processBeforeResponse: false,
 		logLevel: LogLevel.DEBUG,
 	});
 

@@ -21,7 +21,7 @@ export class WorkersReceiver implements Receiver {
 		// Workers don't need to stop a server
 	}
 
-	async handleRequest(request: Request): Promise<Response> {
+	async handleRequest(request: Request, ctx: ExecutionContext): Promise<Response> {
 		if (request.method !== "POST") {
 			return new Response("Method not allowed", { status: 405 });
 		}
@@ -52,25 +52,40 @@ export class WorkersReceiver implements Receiver {
 
 		// Handle events
 		if (this.bolt) {
-			try {
-				let ackResponse: unknown = undefined;
-				const event = this.createReceiverEvent(payload, (response) => {
-					ackResponse = response;
-				});
-				await this.bolt.processEvent(event);
+			let ackResponse: unknown = undefined;
+			let ackResolve: () => void;
+			const ackPromise = new Promise<void>((resolve) => {
+				ackResolve = resolve;
+			});
 
-				// Return ack response if provided (e.g., validation errors)
-				if (ackResponse !== undefined) {
-					return new Response(JSON.stringify(ackResponse), {
-						status: 200,
-						headers: { "Content-Type": "application/json" },
-					});
-				}
-				return new Response(null, { status: 200 });
-			} catch (error) {
-				console.error("Error processing event:", error);
-				return new Response("Internal server error", { status: 500 });
+			const event = this.createReceiverEvent(payload, (response) => {
+				ackResponse = response;
+				ackResolve();
+			});
+
+			// Start processing and keep worker alive via waitUntil
+			const processPromise = this.bolt
+				.processEvent(event)
+				.catch((error) => {
+					console.error("Error processing event:", error);
+				})
+				.finally(() => {
+					// Fallback: resolve ackPromise if ack() was never called.
+					// Calling resolve multiple times is safe; only the first call takes effect.
+					ackResolve();
+				});
+			ctx.waitUntil(processPromise);
+
+			// Wait only until ack() is called, then return HTTP response immediately
+			await ackPromise;
+
+			if (ackResponse !== undefined) {
+				return new Response(JSON.stringify(ackResponse), {
+					status: 200,
+					headers: { "Content-Type": "application/json" },
+				});
 			}
+			return new Response(null, { status: 200 });
 		}
 
 		return new Response("Bot not initialized", { status: 500 });
