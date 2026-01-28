@@ -15,9 +15,9 @@ export function createApp(env: Env): { app: App; receiver: WorkersReceiver } {
 		logLevel: LogLevel.DEBUG,
 	});
 
-	registerCommands(app);
+	registerCommands(app, env);
 	registerEvents(app);
-	registerActions(app);
+	registerActions(app, env);
 
 	return { app, receiver };
 }

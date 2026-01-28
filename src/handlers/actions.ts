@@ -2,8 +2,10 @@ import type { App } from "@slack/bolt";
 import type { RichTextBlock } from "@slack/types";
 import { questionModal, requestModal, bugModal, otherModal } from "../blocks/modals";
 import { validateBugDateTime } from "../validators/datetime";
+import type { Env } from "../types/env";
+import type { ReportData } from "../types/report";
 
-export function registerActions(app: App): void {
+export function registerActions(app: App, env: Env): void {
 	// Button action handlers
 	app.action("reception_question", async ({ ack, body, client, respond }) => {
 		await ack();
@@ -291,6 +293,57 @@ export function registerActions(app: App): void {
 		await client.chat.postMessage({
 			channel: metadata.channelId,
 			text: `New Inquiry from <@${body.user.id}>`,
+			blocks,
+		});
+	});
+
+	app.view("report_submit", async ({ ack, body, view, client }) => {
+		await ack();
+
+		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
+		const done = view.state.values.report_done.done_text.value ?? "";
+		const plan = view.state.values.report_plan.plan_text.value ?? "";
+		const comment = view.state.values.report_comment.comment_text.value ?? null;
+
+		const reportData: ReportData = {
+			done,
+			plan,
+			comment,
+			submittedAt: new Date().toISOString(),
+			channelId: metadata.channelId,
+		};
+
+		await env.REPORT_KV.put(`report_${body.user.id}`, JSON.stringify(reportData));
+
+		const blocks = [
+			{
+				type: "header",
+				text: { type: "plain_text", text: "Report", emoji: true },
+			},
+			{
+				type: "section",
+				text: { type: "mrkdwn", text: `*From:* <@${body.user.id}>` },
+			},
+			{
+				type: "section",
+				text: { type: "mrkdwn", text: `*今日やったこと:*\n${done}` },
+			},
+			{
+				type: "section",
+				text: { type: "mrkdwn", text: `*明日やること:*\n${plan}` },
+			},
+		];
+
+		if (comment) {
+			blocks.push({
+				type: "section",
+				text: { type: "mrkdwn", text: `*所感:*\n${comment}` },
+			});
+		}
+
+		await client.chat.postMessage({
+			channel: metadata.channelId,
+			text: `Report from <@${body.user.id}>`,
 			blocks,
 		});
 	});

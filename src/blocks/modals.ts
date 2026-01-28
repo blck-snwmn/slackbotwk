@@ -1,4 +1,5 @@
 import type { ModalView } from "@slack/types";
+import type { ReportData } from "../types/report";
 
 export function questionModal(channelId: string): ModalView {
 	return {
@@ -493,6 +494,83 @@ export function otherModal(channelId: string): ModalView {
 				label: {
 					type: "plain_text",
 					text: "Urgency (1-5)",
+				},
+			},
+		],
+	};
+}
+
+export function reportModal(channelId: string, previousData: ReportData | null): ModalView {
+	return {
+		type: "modal",
+		callback_id: "report_submit",
+		private_metadata: JSON.stringify({ channelId }),
+		title: {
+			type: "plain_text",
+			text: "Report",
+		},
+		submit: {
+			type: "plain_text",
+			text: "Submit",
+		},
+		close: {
+			type: "plain_text",
+			text: "Cancel",
+		},
+		blocks: [
+			{
+				type: "input",
+				block_id: "report_done",
+				element: {
+					type: "plain_text_input",
+					action_id: "done_text",
+					multiline: true,
+					placeholder: {
+						type: "plain_text",
+						text: "今日やったことを入力してください",
+					},
+					...(previousData?.done ? { initial_value: previousData.done } : {}),
+				},
+				label: {
+					type: "plain_text",
+					text: "今日やったこと",
+				},
+			},
+			{
+				type: "input",
+				block_id: "report_plan",
+				element: {
+					type: "plain_text_input",
+					action_id: "plan_text",
+					multiline: true,
+					placeholder: {
+						type: "plain_text",
+						text: "明日やることを入力してください",
+					},
+					...(previousData?.plan ? { initial_value: previousData.plan } : {}),
+				},
+				label: {
+					type: "plain_text",
+					text: "明日やること",
+				},
+			},
+			{
+				type: "input",
+				block_id: "report_comment",
+				optional: true,
+				element: {
+					type: "plain_text_input",
+					action_id: "comment_text",
+					multiline: true,
+					placeholder: {
+						type: "plain_text",
+						text: "所感があれば入力してください",
+					},
+					...(previousData?.comment ? { initial_value: previousData.comment } : {}),
+				},
+				label: {
+					type: "plain_text",
+					text: "所感",
 				},
 			},
 		],
