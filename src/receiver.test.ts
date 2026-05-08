@@ -9,10 +9,11 @@ function generateSlackSignature(signingSecret: string, timestamp: string, body: 
 	return `v0=${hmac.digest("hex")}`;
 }
 
-const mockCtx = {
+const mockCtx: ExecutionContext = {
 	waitUntil: () => {},
 	passThroughOnException: () => {},
-} as unknown as ExecutionContext;
+	props: {},
+};
 
 describe("WorkersReceiver", () => {
 	const signingSecret = "test-signing-secret";

@@ -70,7 +70,7 @@ describe("helpMessage", () => {
 		const commandsBlock = result.blocks[2];
 		expect(commandsBlock?.type).toBe("section");
 		if (commandsBlock?.type === "section" && "text" in commandsBlock && commandsBlock.text) {
-			const text = commandsBlock.text as { text?: string };
+			const text: { text?: string } = commandsBlock.text;
 			expect(text.text).toContain("/hello");
 			expect(text.text).toContain("/help");
 		}

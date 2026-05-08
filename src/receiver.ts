@@ -112,7 +112,8 @@ export class WorkersReceiver implements Receiver {
 
 	private parseBody(body: string, contentType: string): StringIndexed {
 		if (contentType.includes("application/json")) {
-			return JSON.parse(body) as StringIndexed;
+			const parsed: StringIndexed = JSON.parse(body);
+			return parsed;
 		}
 
 		// Handle application/x-www-form-urlencoded (slash commands, interactions)
@@ -122,7 +123,8 @@ export class WorkersReceiver implements Receiver {
 		for (const [key, value] of params.entries()) {
 			// payload field contains JSON for interactive components
 			if (key === "payload") {
-				return JSON.parse(value) as StringIndexed;
+				const parsed: StringIndexed = JSON.parse(value);
+				return parsed;
 			}
 			result[key] = value;
 		}
@@ -134,13 +136,13 @@ export class WorkersReceiver implements Receiver {
 		payload: StringIndexed,
 		onAck: (response: unknown) => void,
 	): ReceiverEvent {
-		const ack = async (response?: unknown): Promise<void> => {
+		const ack: AckFn<unknown> = async (response?: unknown): Promise<void> => {
 			onAck(response);
 		};
 
 		return {
 			body: payload,
-			ack: ack as AckFn<unknown>,
+			ack,
 			retryNum: undefined,
 			retryReason: undefined,
 			customProperties: {},
