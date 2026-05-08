@@ -152,18 +152,14 @@ describe("reportModal", () => {
 		expect(planBlock).toBeDefined();
 		expect(commentBlock).toBeDefined();
 
-		if (doneBlock && "element" in doneBlock) {
-			expect((doneBlock.element as { initial_value?: string }).initial_value).toBe(
-				"Implemented feature A",
-			);
+		if (doneBlock && "element" in doneBlock && "initial_value" in doneBlock.element) {
+			expect(doneBlock.element.initial_value).toBe("Implemented feature A");
 		}
-		if (planBlock && "element" in planBlock) {
-			expect((planBlock.element as { initial_value?: string }).initial_value).toBe(
-				"Start feature B",
-			);
+		if (planBlock && "element" in planBlock && "initial_value" in planBlock.element) {
+			expect(planBlock.element.initial_value).toBe("Start feature B");
 		}
-		if (commentBlock && "element" in commentBlock) {
-			expect((commentBlock.element as { initial_value?: string }).initial_value).toBe("Going well");
+		if (commentBlock && "element" in commentBlock && "initial_value" in commentBlock.element) {
+			expect(commentBlock.element.initial_value).toBe("Going well");
 		}
 	});
 
@@ -182,7 +178,7 @@ describe("reportModal", () => {
 		expect(commentBlock).toBeDefined();
 
 		if (commentBlock && "element" in commentBlock) {
-			expect((commentBlock.element as { initial_value?: string }).initial_value).toBeUndefined();
+			expect("initial_value" in commentBlock.element).toBe(false);
 		}
 	});
 });

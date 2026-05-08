@@ -55,7 +55,7 @@ export function registerActions(app: App, env: Env): void {
 	app.view("question_submit", async ({ ack, body, view, client }) => {
 		await ack();
 
-		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
+		const metadata: { channelId: string } = JSON.parse(view.private_metadata);
 		const category = view.state.values.question_category.category_select.selected_option?.value;
 		const question = view.state.values.question_input.question_text.value;
 		const assignee = view.state.values.question_assignee.assignee_select.selected_user;
@@ -96,10 +96,10 @@ export function registerActions(app: App, env: Env): void {
 	app.view("request_submit", async ({ ack, body, view, client }) => {
 		await ack();
 
-		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
+		const metadata: { channelId: string } = JSON.parse(view.private_metadata);
 		const title = view.state.values.request_title.title_text.value;
-		const descriptionRichText = view.state.values.request_description.description_rich_text
-			.rich_text_value as RichTextBlock | undefined;
+		const descriptionRichText: RichTextBlock | undefined =
+			view.state.values.request_description.description_rich_text.rich_text_value;
 		const categories =
 			view.state.values.request_category.category_checkboxes.selected_options?.map(
 				(opt) => opt.value,
@@ -181,7 +181,7 @@ export function registerActions(app: App, env: Env): void {
 
 		await ack();
 
-		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
+		const metadata: { channelId: string } = JSON.parse(view.private_metadata);
 		const summary = view.state.values.bug_summary.summary_text.value;
 		const steps = view.state.values.bug_steps.steps_text.value;
 		const impactAreas =
@@ -240,7 +240,7 @@ export function registerActions(app: App, env: Env): void {
 	app.view("other_submit", async ({ ack, body, view, client }) => {
 		await ack();
 
-		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
+		const metadata: { channelId: string } = JSON.parse(view.private_metadata);
 		const subject = view.state.values.other_subject.subject_text.value;
 		const content = view.state.values.other_content.content_text.value;
 		const email = view.state.values.other_email.email_input.value;
@@ -300,7 +300,7 @@ export function registerActions(app: App, env: Env): void {
 	app.view("report_submit", async ({ ack, body, view, client }) => {
 		await ack();
 
-		const metadata = JSON.parse(view.private_metadata) as { channelId: string };
+		const metadata: { channelId: string } = JSON.parse(view.private_metadata);
 		const done = view.state.values.report_done.done_text.value ?? "";
 		const plan = view.state.values.report_plan.plan_text.value ?? "";
 		const comment = view.state.values.report_comment.comment_text.value ?? null;
