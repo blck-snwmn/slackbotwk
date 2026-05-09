@@ -10,8 +10,8 @@
 		"cf-typegen": "wrangler types",
 		"lint": "oxlint --deny-warnings .",
 		"lint:fix": "oxlint --deny-warnings . --fix",
-		"fmt": "oxfmt src/ --write",
-		"fmt:check": "oxfmt src/ --check"
+		"fmt": "oxfmt --write src/",
+		"fmt:check": "oxfmt --check src/"
 	},
 	"devDependencies": {
 		"@cloudflare/vitest-pool-workers": "0.12.21",
