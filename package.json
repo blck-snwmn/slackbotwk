@@ -14,14 +14,14 @@
 		"fmt:check": "oxfmt --check src/"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "0.16.7",
+		"@cloudflare/vitest-pool-workers": "0.18.0",
 		"@types/node": "^25.0.9",
-		"oxfmt": "^0.48.0",
-		"oxlint": "^1.63.0",
-		"oxlint-tsgolint": "^0.22.1",
-		"typescript": "5.9.3",
-		"vitest": "3.2.4",
-		"wrangler": "4.63.0"
+		"oxfmt": "0.58.0",
+		"oxlint": "1.73.0",
+		"oxlint-tsgolint": "0.24.0",
+		"typescript": "6.0.3",
+		"vitest": "4.1.10",
+		"wrangler": "4.107.0"
 	},
 	"dependencies": {
 		"@slack/bolt": "^4.6.0"
