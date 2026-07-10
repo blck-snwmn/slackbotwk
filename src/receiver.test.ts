@@ -9,10 +9,39 @@ function generateSlackSignature(signingSecret: string, timestamp: string, body: 
 	return `v0=${hmac.digest("hex")}`;
 }
 
+class MockSpan {
+	get isTraced(): boolean {
+		return false;
+	}
+
+	setAttribute(): void {}
+
+	end(): void {}
+}
+
+const mockTracing: Tracing = {
+	enterSpan<T, A extends unknown[]>(
+		_name: string,
+		callback: (span: Span, ...args: A) => T,
+		...args: A
+	): T {
+		return callback(new MockSpan(), ...args);
+	},
+	startActiveSpan<T, A extends unknown[]>(
+		_name: string,
+		callback: (span: Span, ...args: A) => T,
+		...args: A
+	): T {
+		return callback(new MockSpan(), ...args);
+	},
+	Span: MockSpan,
+};
+
 const mockCtx: ExecutionContext = {
 	waitUntil: () => {},
 	passThroughOnException: () => {},
 	props: {},
+	tracing: mockTracing,
 };
 
 describe("WorkersReceiver", () => {
