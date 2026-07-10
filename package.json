@@ -21,7 +21,7 @@
 		"oxlint-tsgolint": "0.24.0",
 		"typescript": "6.0.3",
 		"vitest": "4.1.10",
-		"wrangler": "4.107.0"
+		"wrangler": "4.107.1"
 	},
 	"dependencies": {
 		"@slack/bolt": "^4.6.0"
